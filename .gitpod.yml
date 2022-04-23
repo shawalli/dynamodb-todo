@@ -1,0 +1,11 @@
+image:
+  file: .localstack/Dockerfile.gitpod
+
+tasks:
+  - command: localstack start --host
+  - command: poetry install
+
+ports:
+  # localstack
+  - port: 4566
+    onOpen: ignore
