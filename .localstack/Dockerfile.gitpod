@@ -4,7 +4,7 @@ FROM gitpod/workspace-full
 USER gitpod
 
 # install serverless
-RUN npm install --global serverless
+RUN npm install --global serverless@3.3.0
 
 # install localstack
 RUN sudo apt-get update \

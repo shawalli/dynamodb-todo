@@ -43,10 +43,28 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
+functions:
+  create:
+    handler: api/routes/create.handle
+    events:
+      - http:
+          path: todos
+          method: post
+          cors: true
+
+package:
+  individually: true
+
 plugins:
   - serverless-localstack
+  - serverless-python-requirements
 
 custom:
   localstack:
+    debug: true
     stages:
       - local
+  pythonRequirements:
+    dockerizePip: "non-linux"
+    usePoetry: true
+    pythonBin: /home/gitpod/.pyenv/shims/python
