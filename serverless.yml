@@ -21,7 +21,7 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - "Fn::GetAtt": ["${self:provider.environment.TABLE_NAME}", Arn]
+            - "Fn::GetAtt": [todosTable, Arn]
 
 resources:
   Resources:
@@ -44,11 +44,44 @@ resources:
           WriteCapacityUnits: 1
 
 functions:
-  create:
-    handler: api/routes/create.handle
+  todosCreate:
+    handler: api/routes/todos/create.handle
     events:
       - http:
-          path: todos
+          path: user/{userId}/todos
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                userId: true
+
+  todosGet:
+    handler: api/routes/todos/get.handle
+    events:
+      - http:
+          path: user/{userId}/todos
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                userId: true
+      - http:
+          path: user/{userId}/todos/{todoId}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                userId: true
+                todoId: true
+
+  userCreate:
+    handler: api/routes/user/create.handle
+    events:
+      - http:
+          path: user
           method: post
           cors: true
 
