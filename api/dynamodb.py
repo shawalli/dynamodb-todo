@@ -4,11 +4,7 @@ import boto3
 
 region = os.environ.get("AWS_REGION", "us-east-1")
 
-endpoint = os.environ.get("LOCALSTACK_HOSTNAME", None)
-if endpoint is not None:
-    endpoint = f"http://{endpoint}:4566"
-
-DYNAMODB = boto3.resource("dynamodb", region_name=region, endpoint_url=endpoint)
+DYNAMODB = boto3.resource("dynamodb", region_name=region)
 
 TABLE = DYNAMODB.Table("todoServerless")
 

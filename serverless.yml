@@ -89,14 +89,9 @@ package:
   individually: true
 
 plugins:
-  - serverless-localstack
   - serverless-python-requirements
 
 custom:
-  localstack:
-    debug: true
-    stages:
-      - local
   pythonRequirements:
     dockerizePip: "non-linux"
     usePoetry: true
