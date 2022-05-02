@@ -34,3 +34,17 @@ def create_user(user_id, **user_settings):
     item = dict(userId=user_id, userItem="config", **user_settings)
 
     TABLE.put_item(Item=item)
+
+
+def get_todo(user_id, todo_id):
+    todo_config = {
+        "userId": user_id,
+        "userItem": f"todo#{todo_id}",
+    }
+
+    results = TABLE.get_item(Key=todo_config)
+
+    if "Item" not in results:
+        return None
+
+    return results["Item"]
