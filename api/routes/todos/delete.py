@@ -2,8 +2,8 @@ import uuid
 
 from boto3.dynamodb.conditions import Key
 
+from api import errorcodes
 from api.dynamodb import TABLE, get_todo, user_exists
-from api.errorcodes import RESOURCE_NOT_EXIST
 from api.log import get_logger
 from api.response import make_response
 
@@ -18,7 +18,7 @@ def handle(event, context):
 
     if not user_exists(user_id):
         LOG.error(f'username "{user_id}" does not exist.')
-        return make_response(context.aws_request_id, 400, body={"error": RESOURCE_NOT_EXIST, "developerText": "user does not exist."})
+        return make_response(context.aws_request_id, 400, body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": "user does not exist."})
 
     delete_request = {
         "userId": user_id,
