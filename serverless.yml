@@ -21,7 +21,7 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - "Fn::GetAtt": ["${self:provider.environment.TABLE_NAME}", Arn]
+            - "Fn::GetAtt": [todosTable, Arn]
 
 resources:
   Resources:
@@ -43,10 +43,69 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
+functions:
+  todosCreate:
+    handler: api/routes/todos/create.handle
+    events:
+      - http:
+          path: user/{userId}/todos
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                userId: true
+
+  todosGet:
+    handler: api/routes/todos/get.handle
+    events:
+      - http:
+          path: user/{userId}/todos
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                userId: true
+      - http:
+          path: user/{userId}/todos/{todoId}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                userId: true
+                todoId: true
+
+  todosDelete:
+    handler: api/routes/todos/delete.handle
+    events:
+      - http:
+          path: user/{userId}/todos/{todoId}
+          method: delete
+          cors: true
+          request:
+            parameters:
+              paths:
+                userId: true
+                todoId: true
+
+  userCreate:
+    handler: api/routes/user/create.handle
+    events:
+      - http:
+          path: user
+          method: post
+          cors: true
+
+package:
+  individually: true
+
 plugins:
-  - serverless-localstack
+  - serverless-python-requirements
 
 custom:
-  localstack:
-    stages:
-      - local
+  pythonRequirements:
+    dockerizePip: "non-linux"
+    usePoetry: true
+    pythonBin: /home/gitpod/.pyenv/shims/python

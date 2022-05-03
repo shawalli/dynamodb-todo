@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "dynamodb-todo"
+version = "0.1.0"
+description = ""
+authors = ["shawalli <shawn.p.wallis@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+boto3 = "^1.21.46"
+marshmallow = "^3.15.0"
+marshmallow-dataclass = "^8.5.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
