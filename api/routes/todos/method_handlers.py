@@ -6,6 +6,7 @@ from boto3.dynamodb.conditions import Key
 from marshmallow_dataclass import dataclass
 
 from api import errorcodes
+from api.decorators import handler_user_required
 from api.dynamodb import TABLE, get_todo, user_exists
 from api.log import get_logger
 from api.response import make_response
@@ -27,19 +28,12 @@ class CreatePathParams(BaseRequest):
     user_id: str = field(metadata={"data_key": "userId"})
 
 
+@handler_user_required
 def create(event, context):
     """Creates userId:<user-id> userItem:todo#<todoId> attributes:{body: <text>}."""
     request = CreateUpdateRequest.validates(event["body"])
 
     path_params = GetPathParams.load(event["pathParameters"])
-
-    if not user_exists(path_params.user_id):
-        LOG.error(f'username "{path_params.user_id}" does not exist.')
-        return make_response(
-            context.aws_request_id,
-            400,
-            body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": ""},
-        )
 
     request["userId"] = path_params.user_id
 
@@ -59,16 +53,13 @@ class GetPathParams(BaseRequest):
     todo_id: Optional[str] = field(metadata={"data_key": "todoId"})
 
 
+@handler_user_required
 def get(event, context):
     """Gets one todo if todo-id given, else all user todos."""
 
     path_params = GetPathParams.load(event["pathParameters"])
 
     LOG.info(f'getting todo resource(s) for username "{path_params.user_id}"')
-
-    if not user_exists(path_params.user_id):
-        LOG.error(f'username "{path_params.user_id}" does not exist.')
-        return make_response(context.aws_request_id, 400, body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": ""})
 
     items = []
     if path_params.todo_id is not None:
@@ -111,6 +102,7 @@ class UpdatePathParams(BaseRequest):
     todo_id: str = field(metadata={"data_key": "todoId"})
 
 
+@handler_user_required
 def update(event, context):
     """Updates userId:<user-id> userItem:todo#<todoId>."""
     request = CreateUpdateRequest.validates(event["body"])
@@ -118,10 +110,6 @@ def update(event, context):
     path_params = UpdatePathParams.load(event["pathParameters"])
 
     LOG.info(f'updating todo with id "{path_params.todo_id}" for username "{path_params.user_id}"')
-
-    if not user_exists(path_params.user_id):
-        LOG.error(f'username "{path_params.user_id}" does not exist.')
-        return make_response(context.aws_request_id, 400, body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": "user does not exist."})
 
     if get_todo(path_params.user_id, path_params.todo_id) is None:
         LOG.error(f'todo "{path_params.todo_id}" does not exist.')
@@ -143,15 +131,12 @@ class DeletePathParams(BaseRequest):
     todo_id: str = field(metadata={"data_key": "todoId"})
 
 
+@handler_user_required
 def delete(event, context):
     """Deletes todo item."""
     path_params = DeletePathParams.load(event["pathParameters"])
 
     LOG.info(f'deleting todo with id "{path_params.todo_id}" for username "{path_params.user_id}"')
-
-    if not user_exists(path_params.user_id):
-        LOG.error(f'username "{path_params.user_id}" does not exist.')
-        return make_response(context.aws_request_id, 400, body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": "user does not exist."})
 
     delete_request = {
         "userId": path_params.user_id,
