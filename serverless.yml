@@ -44,6 +44,14 @@ resources:
           WriteCapacityUnits: 1
 
 functions:
+  userResource:
+    handler: api/routes/user/handler.handle
+    events:
+      - http:
+          path: user
+          method: post
+          cors: true
+
   todoResource:
     handler: api/routes/todos/handler.handle
     events:
@@ -94,14 +102,6 @@ functions:
               paths:
                 userId: true
                 todoId: true
-
-  userCreate:
-    handler: api/routes/user/create.handle
-    events:
-      - http:
-          path: user
-          method: post
-          cors: true
 
 package:
   individually: true
