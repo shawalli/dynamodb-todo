@@ -44,20 +44,8 @@ resources:
           WriteCapacityUnits: 1
 
 functions:
-  todosCreate:
-    handler: api/routes/todos/create.handle
-    events:
-      - http:
-          path: user/{userId}/todos
-          method: post
-          cors: true
-          request:
-            parameters:
-              paths:
-                userId: true
-
-  todosGet:
-    handler: api/routes/todos/get.handle
+  todoResource:
+    handler: api/routes/todos/handler.handle
     events:
       - http:
           path: user/{userId}/todos
@@ -67,6 +55,7 @@ functions:
             parameters:
               paths:
                 userId: true
+
       - http:
           path: user/{userId}/todos/{todoId}
           method: get
@@ -77,9 +66,15 @@ functions:
                 userId: true
                 todoId: true
 
-  todosUpdate:
-    handler: api/routes/todos/update.handle
-    events:
+      - http:
+          path: user/{userId}/todos
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                userId: true
+
       - http:
           path: user/{userId}/todos/{todoId}
           method: put
@@ -90,9 +85,6 @@ functions:
                 userId: true
                 todoId: true
 
-  todosDelete:
-    handler: api/routes/todos/delete.handle
-    events:
       - http:
           path: user/{userId}/todos/{todoId}
           method: delete
