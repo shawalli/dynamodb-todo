@@ -2,4 +2,4 @@ tasks:
   - command: npm install --global serverless
   - command: npm install --global serverless-python-requirements
   - before: pip install poetry
-    command: poetry install
+    command: cd api/ && poetry install
