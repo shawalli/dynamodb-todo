@@ -77,6 +77,19 @@ functions:
                 userId: true
                 todoId: true
 
+  todosUpdate:
+    handler: api/routes/todos/update.handle
+    events:
+      - http:
+          path: user/{userId}/todos/{todoId}
+          method: put
+          cors: true
+          request:
+            parameters:
+              paths:
+                userId: true
+                todoId: true
+
   todosDelete:
     handler: api/routes/todos/delete.handle
     events:

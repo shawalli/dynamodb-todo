@@ -2,35 +2,23 @@ import uuid
 from dataclasses import field
 from typing import Optional
 
-from marshmallow import INCLUDE
 from marshmallow_dataclass import dataclass
 
+from api import errorcodes
 from api.dynamodb import TABLE, user_exists
-from api.errorcodes import RESOURCE_NOT_EXIST
 from api.log import get_logger
 from api.response import make_response
+from api.types import BaseRequest
 
 LOG = get_logger()
 
-@dataclass
-class CreateRequest:
-    class Meta:
-        unknown = INCLUDE
 
+@dataclass
+class CreateRequest(BaseRequest):
     body: str
     category: Optional[str] = field(default="")
-
-    @classmethod
-    def loads(cls, obj):
-        return cls.Schema().loads(obj)
-    
-    @classmethod
-    def dump(cls, obj):
-        return cls.Schema().dump(obj)
-    
-    @classmethod
-    def validates(cls, obj):
-        return cls.dump(cls.loads(obj))
+    completed: Optional[bool] = field(default=False)
+    deleted: Optional[bool] = field(default=False)
 
 
 def handle(event, context):
@@ -41,7 +29,7 @@ def handle(event, context):
 
     if not user_exists(user_id):
         LOG.error(f'username "{user_id}" does not exist.')
-        return make_response(context.aws_request_id, 400, body={"error": RESOURCE_NOT_EXIST, "developerText": ""})
+        return make_response(context.aws_request_id, 400, body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": ""})
 
     request["userId"] = user_id
 
