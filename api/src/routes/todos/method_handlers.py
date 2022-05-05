@@ -5,12 +5,12 @@ from typing import Optional
 from boto3.dynamodb.conditions import Key
 from marshmallow_dataclass import dataclass
 
-from api import errorcodes
-from api.decorators import handler_user_required
-from api.dynamodb import TABLE, get_todo, user_exists
-from api.log import get_logger
-from api.response import make_response
-from api.types import BaseRequest
+from src import errorcodes
+from src.decorators import handler_user_required
+from src.dynamodb import TABLE, get_todo, user_exists
+from src.log import get_logger
+from src.response import make_response
+from src.types import BaseRequest
 
 LOG = get_logger()
 

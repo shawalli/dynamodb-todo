@@ -3,11 +3,11 @@ from dataclasses import field
 
 from marshmallow_dataclass import dataclass
 
-from api import errorcodes
-from api.dynamodb import create_user, user_exists
-from api.log import get_logger
-from api.response import make_response
-from api.types import BaseRequest
+from src import errorcodes
+from src.dynamodb import create_user, user_exists
+from src.log import get_logger
+from src.response import make_response
+from src.types import BaseRequest
 
 LOG = get_logger()
 
