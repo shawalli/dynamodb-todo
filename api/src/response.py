@@ -12,6 +12,7 @@ def make_response(lambda_execution_id, status=200, body=None):
         "statusCode": status,
         "headers": {
             "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
         },
         "isBase64Encoded": False,
         "body": json.dumps(body),

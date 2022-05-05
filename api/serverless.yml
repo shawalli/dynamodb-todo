@@ -50,7 +50,15 @@ functions:
       - http:
           path: user
           method: post
-          cors: true
+          cors: &cors-setting
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
 
   todoResource:
     handler: src/routes/todos/handler.handle
@@ -58,7 +66,7 @@ functions:
       - http:
           path: user/{userId}/todos
           method: get
-          cors: true
+          cors: *cors-setting
           request:
             parameters:
               paths:
@@ -67,7 +75,7 @@ functions:
       - http:
           path: user/{userId}/todos/{todoId}
           method: get
-          cors: true
+          cors: *cors-setting
           request:
             parameters:
               paths:
@@ -77,7 +85,7 @@ functions:
       - http:
           path: user/{userId}/todos
           method: post
-          cors: true
+          cors: *cors-setting
           request:
             parameters:
               paths:
@@ -86,7 +94,7 @@ functions:
       - http:
           path: user/{userId}/todos/{todoId}
           method: put
-          cors: true
+          cors: *cors-setting
           request:
             parameters:
               paths:
@@ -96,7 +104,7 @@ functions:
       - http:
           path: user/{userId}/todos/{todoId}
           method: delete
-          cors: true
+          cors: *cors-setting
           request:
             parameters:
               paths:
