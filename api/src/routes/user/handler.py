@@ -1,6 +1,6 @@
-from api.log import get_logger
-from api.response import make_response
-from api.routes.user.method_handlers import METHOD_HANDLERS
+from src.log import get_logger
+from src.response import make_response
+from src.routes.user.method_handlers import METHOD_HANDLERS
 
 LOG = get_logger()
 
