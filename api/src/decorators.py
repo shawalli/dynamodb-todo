@@ -32,7 +32,7 @@ def handler_user_required(f):
             return make_response(
                 context.aws_request_id,
                 400,
-                body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": ""},
+                error=errorcodes.RESOURCE_NOT_EXIST,
             )
         
         return f(event, context)
@@ -49,7 +49,7 @@ def handler_todo_required(f):
             return make_response(
                 context.aws_request_id,
                 400,
-                body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": ""},
+                error=errorcodes.RESOURCE_NOT_EXIST,
             )
         
         return f(event, context)

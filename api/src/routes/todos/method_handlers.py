@@ -74,7 +74,7 @@ def get(event, context):
             items.append(results["Item"])
         else:
             LOG.error(f'todo with id "{path_params.todo_id}" does not exist.')
-            return make_response(context.aws_request_id, 404, body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": ""})
+            return make_response(context.aws_request_id, 404, error=errorcodes.RESOURCE_NOT_EXIST)
 
     else:
         LOG.info("getting all todos for username")
@@ -113,7 +113,7 @@ def update(event, context):
 
     if get_todo(path_params.user_id, path_params.todo_id) is None:
         LOG.error(f'todo "{path_params.todo_id}" does not exist.')
-        return make_response(context.aws_request_id, 404, body={"error": errorcodes.RESOURCE_NOT_EXIST, "developerText": ""})
+        return make_response(context.aws_request_id, 404, error=errorcodes.RESOURCE_NOT_EXIST)
 
     request["userId"] = path_params.user_id
     request["userItem"] = f"todo#{path_params.todo_id}"
