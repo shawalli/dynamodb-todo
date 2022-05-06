@@ -1,7 +1,7 @@
-import axios from "axios";
 import { nanoid } from "nanoid";
 import React, { useEffect, useRef, useState } from "react";
 
+import { getTodos, deleteTodo } from "./api";
 import FilterButton from "./components/FilterButton";
 import Form from "./components/Form";
 import Todo from "./components/Todo";
@@ -21,36 +21,17 @@ const FILTER_MAP = {
 };
 const FILTER_NAMES = Object.keys(FILTER_MAP);
 
-axios.defaults.baseURL = 'https://2utbomhdmi.execute-api.us-east-1.amazonaws.com/dev';
 
 export default function App(props) {
   const [tasks, setTasks] = useState([])
   const [filter, setFilter] = useState('All')
 
+  // load todo data
   useEffect(() => {
-    axios.get('/user/shawn/todos')
-    .then(function (response) {
-      console.log("GOT RESULTS");
-      console.log(response);
-      console.log(response.data);
-      console.log(response.data.result)
-
-      const newTasks = response.data.result.map(todo => (
-        {
-          id: todo.todoId,
-          name: todo.body,
-          completed: 'completed' in todo ? todo.completed : false
-        }
-      ));
-
+    getTodos('shawn').then((newTasks) => {
       setTasks([...tasks, ...newTasks]);
-
-    })
-    .catch(function (error) {
-      console.log("GOT ERROR");
-      console.log(error);
     });
-  }, [])
+  }, []);
 
   function addTask(name) {
     const newTask = { id: "todo-" + nanoid(), name: name, completed: false };
@@ -81,8 +62,10 @@ export default function App(props) {
   }
 
   function deleteTask(id) {
-    const remainingTasks = tasks.filter(task => (id !== task.id));
-    setTasks(remainingTasks);
+    deleteTodo('shawn', id).then(() => {
+      const remainingTasks = tasks.filter(task => (id !== task.id));
+      setTasks(remainingTasks);
+    })
   }
 
   const taskList = tasks

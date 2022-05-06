@@ -3,19 +3,23 @@ from copy import deepcopy
 
 
 def make_response(lambda_execution_id, status=200, body=None):
-    if body is None:
-        body = dict()
+    # if body is None:
+    #     body = dict()
     
     body["id"] = deepcopy(lambda_execution_id)
 
     response = {
         "statusCode": status,
         "headers": {
-            "Content-Type": "application/json",
+            # "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
         },
         "isBase64Encoded": False,
-        "body": json.dumps(body),
+        # "body": json.dumps(body),
     }
+
+    if body is not None:
+        response["body"] = json.dumps(body)
+        response["headers"].update({"Content-Type": "application/json"})
 
     return response
