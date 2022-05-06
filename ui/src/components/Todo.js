@@ -100,6 +100,6 @@ export default function Todo(props) {
   }, [wasEditing, isEditing]);
 
   return (
-      <li className="todo">{isEditing ? editingTemplate : viewTemplate}</li>
+      <li className="todo" id={props.id}>{isEditing ? editingTemplate : viewTemplate}</li>
   );
 }

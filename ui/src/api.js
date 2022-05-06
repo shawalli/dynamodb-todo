@@ -4,7 +4,7 @@ axios.defaults.baseURL = 'https://2utbomhdmi.execute-api.us-east-1.amazonaws.com
 
 export function getTodos(user) {
   return axios.get(`/user/${user}/todos`)
-  .then(function (response) {
+  .then((response) => {
       const tasks = response.data.result.map(todo => (
         {
           id: todo.todoId,
@@ -17,7 +17,29 @@ export function getTodos(user) {
   })
 }
 
+export function createTodo(user, body, category) {
+  if (category === undefined) {
+    category = "default"
+  }
+  return axios.post(`/user/${user}/todos`, {
+    body: body,
+    category: category
+  })
+  .then((response) => {
+    return response.data.todoId;
+  });
+}
+
+export function editTodo(user, todoId, body, category, completed) {
+  return axios.put(`/user/${user}/todos/${todoId}`, {
+    body: body,
+    category: category,
+    completed: completed
+  })
+  .then((response) => {});
+}
+
 export function deleteTodo(user, todoId) {
-    return axios.delete(`/user/${user}/${todoId}`)
+    return axios.delete(`/user/${user}/todos/${todoId}`)
     .then(function(response) {});
 }

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 function Form(props) {
   const [name, setName] = useState('');
+  const [category, setCategory] = useState('default');
 
   function handleChange(e) {
     setName(e.target.value);
@@ -9,7 +10,7 @@ function Form(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    props.addTask(name);
+    props.addTask(name, category);
     setName('');
   }
 

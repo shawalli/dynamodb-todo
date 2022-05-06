@@ -1,7 +1,6 @@
-import { nanoid } from "nanoid";
 import React, { useEffect, useRef, useState } from "react";
 
-import { getTodos, deleteTodo } from "./api";
+import { createTodo, deleteTodo, editTodo, getTodos } from "./api";
 import FilterButton from "./components/FilterButton";
 import Form from "./components/Form";
 import Todo from "./components/Todo";
@@ -33,32 +32,53 @@ export default function App(props) {
     });
   }, []);
 
-  function addTask(name) {
-    const newTask = { id: "todo-" + nanoid(), name: name, completed: false };
+  function addTask(body, category) {
+    createTodo('shawn', body, category).then((response) => {
 
-    setTasks([...tasks, newTask]);
+      const newTask = { id: response.todoId, name: body, completed: false };
+
+      setTasks([...tasks, newTask]);
+    })
   }
 
   function toggleTaskCompleted(id) {
+    let updatedTask
+
     const updatedTasks = tasks.map(task => {
       if (id === task.id) {
-        return {...task, completed: !task.completed}
+        updatedTask = { ...task, completed: !task.completed };
+
+        return updatedTask;
       }
 
       return task;
     });
-    setTasks(updatedTasks);
+
+    if (updatedTask !== undefined) {
+      editTodo("shawn", updatedTask.id, updatedTask.name, "default", updatedTask.completed).then((response) => {
+        setTasks(updatedTasks);
+      });
+    }
   }
 
-  function editTask(id, newName) {
+  function editTask(id, newBody) {
+    let updatedTask
+
     const updatedTasks = tasks.map(task => {
       if (id === task.id) {
-        return {...task, name: newName}
+        updatedTask = { ...task, name: newBody };
+
+        return updatedTask;
       }
 
       return task;
     });
-    setTasks(updatedTasks);
+
+    editTodo("shawn", updatedTask.id, newBody, "default", updatedTask.completed).then((response) => {
+      setTasks(updatedTasks);
+    });
+
+
   }
 
   function deleteTask(id) {
@@ -69,9 +89,9 @@ export default function App(props) {
   }
 
   const taskList = tasks
-  .filter(FILTER_MAP[filter])
-  .map(task => (
-    <Todo
+    .filter(FILTER_MAP[filter])
+    .map(task => (
+      <Todo
         id={task.id}
         name={task.name}
         completed={task.completed}
@@ -81,14 +101,14 @@ export default function App(props) {
         deleteTask={deleteTask}
       />
     )
-  );
+    );
 
   const filterList = FILTER_NAMES.map(name => (
     <FilterButton
       key={name}
       name={name}
       isPressed={name === filter}
-      setFilter={setFilter}  
+      setFilter={setFilter}
     />
   ));
 
