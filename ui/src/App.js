@@ -35,7 +35,7 @@ export default function App(props) {
   function addTask(body, category) {
     createTodo('shawn', body, category).then((response) => {
 
-      const newTask = { id: response.todoId, name: body, completed: false };
+      const newTask = { id: response.todoId, body: body, completed: false };
 
       setTasks([...tasks, newTask]);
     })
@@ -55,7 +55,7 @@ export default function App(props) {
     });
 
     if (updatedTask !== undefined) {
-      editTodo("shawn", updatedTask.id, updatedTask.name, "default", updatedTask.completed).then((response) => {
+      editTodo("shawn", updatedTask.id, updatedTask.body, "default", updatedTask.completed).then((response) => {
         setTasks(updatedTasks);
       });
     }
@@ -66,7 +66,7 @@ export default function App(props) {
 
     const updatedTasks = tasks.map(task => {
       if (id === task.id) {
-        updatedTask = { ...task, name: newBody };
+        updatedTask = { ...task, body: newBody };
 
         return updatedTask;
       }
@@ -93,7 +93,7 @@ export default function App(props) {
     .map(task => (
       <Todo
         id={task.id}
-        name={task.name}
+        body={task.body}
         completed={task.completed}
         key={task.id}
         toggleTaskCompleted={toggleTaskCompleted}

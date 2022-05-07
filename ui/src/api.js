@@ -8,7 +8,7 @@ export function getTodos(user) {
       const tasks = response.data.result.map(todo => (
         {
           id: todo.todoId,
-          name: todo.body,
+          body: todo.body,
           completed: 'completed' in todo ? todo.completed : false
         }
       ));
