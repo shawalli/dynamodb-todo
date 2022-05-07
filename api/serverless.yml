@@ -51,7 +51,7 @@ functions:
           path: user
           method: post
           cors: &cors-setting
-            origin: '*'
+            origin: "https://3000-shawalli-dynamodbtodo-a80t7qjidxx.ws-us44.gitpod.io/"
             headers:
               - Content-Type
               - X-Amz-Date
