@@ -25,7 +25,7 @@ def create(event, context):
 
     if user_exists(request.user_id):
         LOG.error(f'username "{request.user_id}" already exists')
-        return make_response(context.aws_request_id, 400, body={"error": errorcodes.RESOURCE_ALREADY_EXIST, "developerText": ""})
+        return make_response(context.aws_request_id, 400, errorcodes.RESOURCE_ALREADY_EXIST)
 
     create_user(request.user_id)
 
