@@ -3,3 +3,8 @@ tasks:
   - command: npm install --global serverless-python-requirements
   - before: pip install poetry
     command: cd api/ && poetry install
+
+github:
+  prebuilds:
+    main: true
+    branches: true
