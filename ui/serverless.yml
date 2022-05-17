@@ -1,0 +1,40 @@
+service: todo-ui
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+
+resources:
+  Resources:
+    StaticSite:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+        BucketName: ${self:custom.bucketName}
+        WebsiteConfiguration:
+          IndexDocument: index.html
+    BucketPolicy:
+      Type: "AWS::S3::BucketPolicy"
+      Properties:
+        Bucket: ${self:custom.bucketName}
+        PolicyDocument:
+          Statement:
+            - Effect: "Allow"
+              Principal: "*"
+              Action:
+                - s3:GetObject
+              Resource:
+                Fn::Join: ["/", ["Fn::GetAtt": [StaticSite, Arn], "*"]]
+
+plugins:
+  - serverless-s3-sync
+
+custom:
+  bucketName: serverless-todo-g2j3
+  s3Sync:
+    - bucketName: ${self:custom.bucketName}
+      localDir: build
+      deleteRemoved: true

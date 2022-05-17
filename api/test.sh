@@ -5,7 +5,7 @@ API_HOSTNAME=https://2utbomhdmi.execute-api.us-east-1.amazonaws.com/dev
 TODOS_ENDPOINT=todos
 USER_ENDPOINT=user
 
-CREATE_USER_REQUEST='{"username": "shawn"}'
+CREATE_USER_REQUEST='{"userId": "shawn"}'
 CREATE_TODO_REQUEST='{"body": "foo"}'
 UPDATE_TODO_REQUEST='{"body": "foobar", "completed": true}'
 

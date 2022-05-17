@@ -28,15 +28,15 @@ def handler_user_required(f):
         path_params = HandlerUserRequiredPathParams.load(event["pathParameters"])
 
         if not user_exists(path_params.user_id):
-            LOG.error(f'username "{path_params.user_id}" does not exist.')
+            LOG.error(f'user-id "{path_params.user_id}" does not exist.')
             return make_response(
                 context.aws_request_id,
                 400,
                 error=errorcodes.RESOURCE_NOT_EXIST,
             )
-        
+
         return f(event, context)
-    
+
     return wrapper
 
 def handler_todo_required(f):
@@ -45,13 +45,13 @@ def handler_todo_required(f):
         path_params = HandlerUserRequiredPathParams.load(event["pathParameters"])
 
         if not todo_exists(path_params.user_id, path_params.todo_id):
-            LOG.error(f'username "{path_params.user_id}" does not exist.')
+            LOG.error(f'user-id "{path_params.user_id}" does not exist.')
             return make_response(
                 context.aws_request_id,
                 400,
                 error=errorcodes.RESOURCE_NOT_EXIST,
             )
-        
+
         return f(event, context)
-    
+
     return wrapper
