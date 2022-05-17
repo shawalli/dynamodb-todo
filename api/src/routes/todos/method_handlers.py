@@ -59,7 +59,7 @@ def get(event, context):
 
     path_params = GetPathParams.load(event["pathParameters"])
 
-    LOG.info(f'getting todo resource(s) for username "{path_params.user_id}"')
+    LOG.info(f'getting todo resource(s) for user-id "{path_params.user_id}"')
 
     items = []
     if path_params.todo_id is not None:
@@ -77,7 +77,7 @@ def get(event, context):
             return make_response(context.aws_request_id, 404, error=errorcodes.RESOURCE_NOT_EXIST)
 
     else:
-        LOG.info("getting all todos for username")
+        LOG.info("getting all todos for user-id")
         results = TABLE.query(
             KeyConditionExpression=Key("userId").eq(path_params.user_id) & Key("userItem").begins_with("todo#")
         )
@@ -109,7 +109,7 @@ def update(event, context):
 
     path_params = UpdatePathParams.load(event["pathParameters"])
 
-    LOG.info(f'updating todo with id "{path_params.todo_id}" for username "{path_params.user_id}"')
+    LOG.info(f'updating todo with id "{path_params.todo_id}" for user-id "{path_params.user_id}"')
 
     if get_todo(path_params.user_id, path_params.todo_id) is None:
         LOG.error(f'todo "{path_params.todo_id}" does not exist.')
@@ -136,7 +136,7 @@ def delete(event, context):
     """Deletes todo item."""
     path_params = DeletePathParams.load(event["pathParameters"])
 
-    LOG.info(f'deleting todo with id "{path_params.todo_id}" for username "{path_params.user_id}"')
+    LOG.info(f'deleting todo with id "{path_params.todo_id}" for user-id "{path_params.user_id}"')
 
     delete_request = {
         "userId": path_params.user_id,

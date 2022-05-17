@@ -29,7 +29,8 @@ def make_response(lambda_execution_id, status_code=200, body=None, error=None, d
     response = {
         "statusCode": status_code,
         "headers": {
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": "https://3000-shawalli-dynamodbtodo-oyfo9eg7a2b.ws-us45.gitpod.io", #"http://serverless-todo-g2j3.s3-website-us-east-1.amazonaws.com",
+            "Access-Control-Allow-Credentials": True,
         },
         "isBase64Encoded": False,
     }

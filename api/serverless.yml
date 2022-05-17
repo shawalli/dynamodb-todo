@@ -1,6 +1,6 @@
 service: todo
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
@@ -51,7 +51,8 @@ functions:
           path: user
           method: post
           cors: &cors-setting
-            origin: "https://3000-shawalli-dynamodbtodo-a80t7qjidxx.ws-us44.gitpod.io/"
+            origin: "https://3000-shawalli-dynamodbtodo-oyfo9eg7a2b.ws-us45.gitpod.io"
+            # origin: "http://serverless-todo-g2j3.s3-website-us-east-1.amazonaws.com"
             headers:
               - Content-Type
               - X-Amz-Date
@@ -59,6 +60,16 @@ functions:
               - X-Api-Key
               - X-Amz-Security-Token
               - X-Amz-User-Agent
+            allowCredentials: false
+
+      - http:
+          path: user/{userId}
+          method: get
+          cors: *cors-setting
+          request:
+            parameters:
+              paths:
+                userId: true
 
   todoResource:
     handler: src/routes/todos/handler.handle

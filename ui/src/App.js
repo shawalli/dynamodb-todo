@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { createTodo, deleteTodo, editTodo, getTodos } from "./api";
+import { createUser, getUser } from "./api";
+import Authenticated from "./components/Authenticated";
 import FilterButton from "./components/FilterButton";
 import Form from "./components/Form";
 import Todo from "./components/Todo";
@@ -13,6 +15,14 @@ function usePrevious(value) {
   return ref.current;
 }
 
+function getUserIdFromIdToken(idToken) {
+  const tokenPayload = idToken.split('.')[1];
+  const userDetails = JSON.parse(atob(tokenPayload));
+  console.log(userDetails);
+
+  return userDetails.email;
+}
+
 const FILTER_MAP = {
   All: () => true,
   Active: task => !task.completed,
@@ -22,18 +32,38 @@ const FILTER_NAMES = Object.keys(FILTER_MAP);
 
 
 export default function App(props) {
+  const [idToken, setIdToken] = useState()
+  const [userId, setUserId] = useState()
   const [tasks, setTasks] = useState([])
   const [filter, setFilter] = useState('All')
 
   // load todo data
   useEffect(() => {
-    getTodos('shawn').then((newTasks) => {
-      setTasks([...tasks, ...newTasks]);
-    });
-  }, []);
+    if (idToken === undefined) {
+      return;
+    }
+
+    const user = getUserIdFromIdToken(idToken);
+    setUserId(user);
+    console.log(`Getting user details for ${user}`)
+
+    getUser(user)
+      .then((userDetails) => {
+        if (userDetails === undefined) {
+          console.log(`user ${user} does not exist; creating...`)
+          return createUser(user).then(() => {
+            console.log(`user ${user} created`)
+          });
+        }
+      }).then(() => {
+        getTodos(user).then((newTasks) => {
+          setTasks([...tasks, ...newTasks]);
+        });
+      })
+  }, [idToken]);
 
   function addTask(body, category) {
-    createTodo('shawn', body, category).then((response) => {
+    createTodo(userId, body, category).then((response) => {
 
       const newTask = { id: response.todoId, body: body, completed: false };
 
@@ -55,7 +85,7 @@ export default function App(props) {
     });
 
     if (updatedTask !== undefined) {
-      editTodo("shawn", updatedTask.id, updatedTask.body, "default", updatedTask.completed).then((response) => {
+      editTodo(userId, updatedTask.id, updatedTask.body, "default", updatedTask.completed).then((response) => {
         setTasks(updatedTasks);
       });
     }
@@ -74,15 +104,17 @@ export default function App(props) {
       return task;
     });
 
-    editTodo("shawn", updatedTask.id, newBody, "default", updatedTask.completed).then((response) => {
-      setTasks(updatedTasks);
-    });
+    if (updatedTask !== undefined) {
+      editTodo(userId, updatedTask.id, newBody, "default", updatedTask.completed).then((response) => {
+        setTasks(updatedTasks);
+      });
+    }
 
 
   }
 
   function deleteTask(id) {
-    deleteTodo('shawn', id).then(() => {
+    deleteTodo(userId, id).then(() => {
       const remainingTasks = tasks.filter(task => (id !== task.id));
       setTasks(remainingTasks);
     })
@@ -127,19 +159,22 @@ export default function App(props) {
   return (
     <div className="todoapp stack-large">
       <h1>TodoMatic</h1>
-      <Form addTask={addTask} />
-      <div className="filters btn-group stack-exception">
-        {filterList}
-      </div>
-      <h2 id="list-heading" tabIndex="-1" ref={listHeadingRef}>
-        {headingText}
-      </h2>
-      <ul
-        className="todo-list stack-large stack-exception"
-        aria-labelledby="list-heading"
-      >
-        {taskList}
-      </ul>
+      <Authenticated idToken={idToken} setIdToken={setIdToken}>
+        {/* <Logout idToken={idToken} setIdToken={setIdToken} /> */}
+        <Form addTask={addTask} />
+        <div className="filters btn-group stack-exception">
+          {filterList}
+        </div>
+        <h2 id="list-heading" tabIndex="-1" ref={listHeadingRef}>
+          {headingText}
+        </h2>
+        <ul
+          className="todo-list stack-large stack-exception"
+          aria-labelledby="list-heading"
+        >
+          {taskList}
+        </ul>
+      </Authenticated>
     </div>
   );
 }

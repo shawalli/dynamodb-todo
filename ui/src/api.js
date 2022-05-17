@@ -2,8 +2,32 @@ import axios from "axios";
 
 axios.defaults.baseURL = 'https://2utbomhdmi.execute-api.us-east-1.amazonaws.com/dev';
 
-export function getTodos(user) {
-  return axios.get(`/user/${user}/todos`)
+export function getUser(userId) {
+  return axios.get(`/user/${userId}`)
+    .then((response) => {
+      return Object.keys(response.data.result).length !== 0 ? response.data.result : undefined;
+    });
+}
+
+export function createUser(userId) {
+  return axios({
+    method: 'post',
+    url: '/user',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: {
+      userId: userId
+    }
+  })
+    .then(() => {
+      return;
+    });
+}
+
+
+export function getTodos(userId) {
+  return axios.get(`/user/${userId}/todos`)
     .then((response) => {
       const tasks = response.data.result.map(todo => (
         {
@@ -17,21 +41,28 @@ export function getTodos(user) {
     })
 }
 
-export function createTodo(user, body, category) {
+export function createTodo(userId, body, category) {
   if (category === undefined) {
     category = "default"
   }
-  return axios.post(`/user/${user}/todos`, {
-    body: body,
-    category: category
+  return axios({
+    method: 'post',
+    url: `/user/${userId}/todos`,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: {
+      body: body,
+      category: category
+    }
   })
     .then((response) => {
       return response.data.todoId;
     });
 }
 
-export function editTodo(user, todoId, body, category, completed) {
-  return axios.put(`/user/${user}/todos/${todoId}`, {
+export function editTodo(userId, todoId, body, category, completed) {
+  return axios.put(`/user/${userId}/todos/${todoId}`, {
     body: body,
     category: category,
     completed: completed
@@ -39,7 +70,7 @@ export function editTodo(user, todoId, body, category, completed) {
     .then((response) => { });
 }
 
-export function deleteTodo(user, todoId) {
-  return axios.delete(`/user/${user}/todos/${todoId}`)
+export function deleteTodo(userId, todoId) {
+  return axios.delete(`/user/${userId}/todos/${todoId}`)
     .then(function (response) { });
 }

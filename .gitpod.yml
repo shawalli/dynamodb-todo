@@ -1,6 +1,7 @@
 tasks:
   - command: npm install --global serverless
   - command: npm install --global serverless-python-requirements
+  - command: npm install --global serverless-s3-sync
   - before: pip install poetry
     command: cd api/ && poetry install
 
