@@ -4,6 +4,7 @@ from dataclasses import field
 from marshmallow_dataclass import dataclass
 
 from src import errorcodes
+from src.decorators import require_user_own_record
 from src.dynamodb import create_user, get_user_config, user_exists
 from src.log import get_logger
 from src.response import make_response
@@ -17,6 +18,7 @@ class GetPathParams(BaseRequest):
     user_id: str = field(metadata={"data_key": "userId"})
 
 
+@require_user_own_record
 def get(event, context):
     """Gets one todo if todo-id given, else all user todos."""
 
@@ -38,6 +40,7 @@ class CreateRequest(BaseRequest):
     user_id: str = field(metadata={"data_key": "userId"})
 
 
+@require_user_own_record
 def create(event, context):
     """Creates userId:<user-id> userItem:config attributes:{categories: []}."""
     request = CreateRequest.loads(event["body"])

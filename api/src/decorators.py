@@ -1,34 +1,20 @@
-import logging
-from dataclasses import field
 from functools import wraps
 
-from marshmallow import EXCLUDE
-from marshmallow_dataclass import dataclass
-
 from src import errorcodes
-from src.dynamodb import create_user, user_exists
+from src.dynamodb import user_exists
 from src.log import get_logger
 from src.response import make_response
-from src.types import BaseRequest
 
 LOG = get_logger()
 
 
-@dataclass
-class HandlerUserRequiredPathParams(BaseRequest):
-    class Meta:
-        unknown = EXCLUDE
-
-    user_id: str = field(metadata={"data_key": "userId"})
-
-
-def handler_user_required(f):
+def require_user(f):
     @wraps(f)
     def wrapper(event, context):
-        path_params = HandlerUserRequiredPathParams.load(event["pathParameters"])
+        user_id = event["pathParameters"].get("userId")
 
-        if not user_exists(path_params.user_id):
-            LOG.error(f'user-id "{path_params.user_id}" does not exist.')
+        if not user_exists(user_id):
+            LOG.error(f'user-id "{user_id}" does not exist.')
             return make_response(
                 context.aws_request_id,
                 400,
@@ -39,18 +25,31 @@ def handler_user_required(f):
 
     return wrapper
 
-def handler_todo_required(f):
+
+def require_user_own_record(f):
     @wraps(f)
     def wrapper(event, context):
-        path_params = HandlerUserRequiredPathParams.load(event["pathParameters"])
+        body = event["body"] or {}
 
-        if not todo_exists(path_params.user_id, path_params.todo_id):
-            LOG.error(f'user-id "{path_params.user_id}" does not exist.')
-            return make_response(
-                context.aws_request_id,
-                400,
-                error=errorcodes.RESOURCE_NOT_EXIST,
-            )
+        requested_user_id = event["pathParameters"].get("userId") or body.get("userId")
+        if requested_user_id is None:
+            raise ValueError("userId not found in request path or body")
+
+        authorizer_context = event["requestContext"].get("authorizer", {})
+
+        authed_user_id = authorizer_context.get("userId")
+        if authed_user_id is None:
+            LOG.warn(f'unable to get authorized user-id for requested user-id "{requested_user_id}"')
+        else:
+            if requested_user_id != authed_user_id:
+                LOG.error(
+                    f'user-id "{authed_user_id}" requested access to data owned by "{requested_user_id}"; blocked'
+                )
+                return make_response(
+                    context.aws_request_id,
+                    403,
+                    error=errorcodes.RESOURCE_NOT_OWNED_BY_REQUESTOR,
+                )
 
         return f(event, context)
 

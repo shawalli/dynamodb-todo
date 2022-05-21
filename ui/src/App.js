@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { createTodo, deleteTodo, editTodo, getTodos } from "./api";
 import { createUser, getUser } from "./api";
+import { getUserIdFromToken, retrieveTokenFromStorage, saveTokenToStorage } from "./token";
 import Authenticated from "./components/Authenticated";
 import FilterButton from "./components/FilterButton";
 import Form from "./components/Form";
@@ -13,14 +14,6 @@ function usePrevious(value) {
     ref.current = value;
   });
   return ref.current;
-}
-
-function getUserIdFromIdToken(idToken) {
-  const tokenPayload = idToken.split('.')[1];
-  const userDetails = JSON.parse(atob(tokenPayload));
-  console.log(userDetails);
-
-  return userDetails.email;
 }
 
 const FILTER_MAP = {
@@ -37,14 +30,25 @@ export default function App(props) {
   const [tasks, setTasks] = useState([])
   const [filter, setFilter] = useState('All')
 
-  // load todo data
+  // get token from local storage during first load
+  useEffect(() => {
+    const idToken = retrieveTokenFromStorage();
+
+    if (idToken !== null) {
+      setIdToken(idToken);
+    }
+  }, []);
+
+  // load todo data with valid id-token
   useEffect(() => {
     if (idToken === undefined) {
       return;
     }
 
-    const user = getUserIdFromIdToken(idToken);
+    const user = getUserIdFromToken(idToken);
     setUserId(user);
+    saveTokenToStorage(idToken);
+
     console.log(`Getting user details for ${user}`)
 
     getUser(user)

@@ -1,21 +1,40 @@
 import axios from "axios";
 
+import { retrieveTokenFromStorage } from './token';
+
 axios.defaults.baseURL = 'https://2utbomhdmi.execute-api.us-east-1.amazonaws.com/dev';
 
+axios.interceptors.request.use(function (config) {
+  const token = retrieveTokenFromStorage();
+
+  // inject authorization for each request
+  config.headers['Authorization'] = `Bearer ${token}`;
+
+  // inject content-type if necessary and not provided
+  if ((config.data !== undefined) && !('Content-Type' in config.headers)) {
+    // assume that all payloads are JSON
+    config.headers['Content-Type'] = 'application/json';
+  }
+
+  return config;
+});
+
 export function getUser(userId) {
-  return axios.get(`/user/${userId}`)
+  return axios({
+    method: 'get',
+    url: `/user/${userId}`
+  })
     .then((response) => {
       return Object.keys(response.data.result).length !== 0 ? response.data.result : undefined;
     });
 }
 
 export function createUser(userId) {
+  const token = retrieveTokenFromStorage()
+
   return axios({
     method: 'post',
     url: '/user',
-    headers: {
-      'Content-Type': 'application/json'
-    },
     data: {
       userId: userId
     }
@@ -27,7 +46,12 @@ export function createUser(userId) {
 
 
 export function getTodos(userId) {
-  return axios.get(`/user/${userId}/todos`)
+  const token = retrieveTokenFromStorage()
+
+  return axios({
+    method: 'get',
+    url: `/user/${userId}/todos`
+  })
     .then((response) => {
       const tasks = response.data.result.map(todo => (
         {
@@ -42,15 +66,14 @@ export function getTodos(userId) {
 }
 
 export function createTodo(userId, body, category) {
+  const token = retrieveTokenFromStorage()
+
   if (category === undefined) {
     category = "default"
   }
   return axios({
     method: 'post',
     url: `/user/${userId}/todos`,
-    headers: {
-      'Content-Type': 'application/json'
-    },
     data: {
       body: body,
       category: category
@@ -62,15 +85,26 @@ export function createTodo(userId, body, category) {
 }
 
 export function editTodo(userId, todoId, body, category, completed) {
-  return axios.put(`/user/${userId}/todos/${todoId}`, {
-    body: body,
-    category: category,
-    completed: completed
+  const token = retrieveTokenFromStorage()
+
+  return axios({
+    method: 'put',
+    url: `/user/${userId}/todos/${todoId}`,
+    data: {
+      body: body,
+      category: category,
+      completed: completed
+    }
   })
     .then((response) => { });
 }
 
 export function deleteTodo(userId, todoId) {
-  return axios.delete(`/user/${userId}/todos/${todoId}`)
+  const token = retrieveTokenFromStorage()
+
+  return axios({
+    method: 'delete',
+    url: `/user/${userId}/todos/${todoId}`
+  })
     .then(function (response) { });
 }
