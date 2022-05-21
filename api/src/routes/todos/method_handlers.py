@@ -6,7 +6,7 @@ from boto3.dynamodb.conditions import Key
 from marshmallow_dataclass import dataclass
 
 from src import errorcodes
-from src.decorators import handler_user_required
+from src.decorators import require_user, require_user_own_record
 from src.dynamodb import TABLE, get_todo, user_exists
 from src.log import get_logger
 from src.response import make_response
@@ -28,7 +28,8 @@ class CreatePathParams(BaseRequest):
     user_id: str = field(metadata={"data_key": "userId"})
 
 
-@handler_user_required
+@require_user
+@require_user_own_record
 def create(event, context):
     """Creates userId:<user-id> userItem:todo#<todoId> attributes:{body: <text>}."""
     request = CreateUpdateRequest.validates(event["body"])
@@ -53,7 +54,8 @@ class GetPathParams(BaseRequest):
     todo_id: Optional[str] = field(metadata={"data_key": "todoId"})
 
 
-@handler_user_required
+@require_user
+@require_user_own_record
 def get(event, context):
     """Gets one todo if todo-id given, else all user todos."""
 
@@ -102,7 +104,8 @@ class UpdatePathParams(BaseRequest):
     todo_id: str = field(metadata={"data_key": "todoId"})
 
 
-@handler_user_required
+@require_user
+@require_user_own_record
 def update(event, context):
     """Updates userId:<user-id> userItem:todo#<todoId>."""
     request = CreateUpdateRequest.validates(event["body"])
@@ -131,7 +134,8 @@ class DeletePathParams(BaseRequest):
     todo_id: str = field(metadata={"data_key": "todoId"})
 
 
-@handler_user_required
+@require_user
+@require_user_own_record
 def delete(event, context):
     """Deletes todo item."""
     path_params = DeletePathParams.load(event["pathParameters"])
