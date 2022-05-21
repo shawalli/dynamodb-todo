@@ -6,6 +6,14 @@ function decodeTokenPayload(token) {
     return tokenDetails;
 }
 
+function isTokenExpired(token) {
+    const tokenPayload = decodeTokenPayload(token);
+
+    const secondsSinceEpoch = Math.round((new Date()).getTime() / 1000)
+
+    return (tokenPayload.exp - secondsSinceEpoch) <= 0 ? true : false;
+}
+
 export function getUserIdFromToken(token) {
     const tokenPayload = decodeTokenPayload(token);
 
@@ -18,6 +26,10 @@ export function saveTokenToStorage(token) {
 
 export function retrieveTokenFromStorage() {
     const token = localStorage.getItem('apiToken');
+
+    if ((token === null) || (isTokenExpired(token))) {
+        return null;
+    }
 
     return token;
 }
