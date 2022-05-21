@@ -44,27 +44,26 @@ resources:
           WriteCapacityUnits: 1
 
 functions:
+  jwtAuthorizer:
+    handler: src/routes/authorize.handle
+
   userResource:
     handler: src/routes/user/handler.handle
     events:
       - http:
-          path: user
-          method: post
-          cors: &cors-setting
-            origin: "https://3000-shawalli-dynamodbtodo-oyfo9eg7a2b.ws-us45.gitpod.io"
-            # origin: "http://serverless-todo-g2j3.s3-website-us-east-1.amazonaws.com"
-            headers:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-            allowCredentials: false
-
-      - http:
           path: user/{userId}
           method: get
+          authorizer: &authorizer
+            name: jwtAuthorizer
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: request
+          cors: &cors-setting true
+
+      - http:
+          path: user
+          method: post
+          authorizer: *authorizer
           cors: *cors-setting
           request:
             parameters:
@@ -77,6 +76,7 @@ functions:
       - http:
           path: user/{userId}/todos
           method: get
+          authorizer: *authorizer
           cors: *cors-setting
           request:
             parameters:
@@ -86,6 +86,7 @@ functions:
       - http:
           path: user/{userId}/todos/{todoId}
           method: get
+          authorizer: *authorizer
           cors: *cors-setting
           request:
             parameters:
@@ -96,6 +97,7 @@ functions:
       - http:
           path: user/{userId}/todos
           method: post
+          authorizer: *authorizer
           cors: *cors-setting
           request:
             parameters:
@@ -105,6 +107,7 @@ functions:
       - http:
           path: user/{userId}/todos/{todoId}
           method: put
+          authorizer: *authorizer
           cors: *cors-setting
           request:
             parameters:
@@ -115,6 +118,7 @@ functions:
       - http:
           path: user/{userId}/todos/{todoId}
           method: delete
+          authorizer: *authorizer
           cors: *cors-setting
           request:
             parameters:
